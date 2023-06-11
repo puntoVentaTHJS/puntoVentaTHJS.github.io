@@ -14,32 +14,46 @@
     <div id="camera"></div>
     <div id="result"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', function () {
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector('#camera')
-                },
-                decoder: {
-                    readers: ["code_128_reader"]
-                }
-            }, function (err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                console.log("Inicialización finalizada. Listo para comenzar");
-                Quagga.start();
-            });
+    <button onclick="startBarcodeScanner()">Iniciar escaneo</button>
+    <button onclick="stopBarcodeScanner()">Detener escaneo</button>
 
-            Quagga.onDetected(function (data) {
-                console.log(data.codeResult.code);
-                document.getElementById('result').textContent = data.codeResult.code;
-            });
-        });
+    <script src="https://unpkg.com/@zxing/library@0.19.0"></script>
+    <script>
+        let codeReader;
+
+        function startBarcodeScanner() {
+            const video = document.createElement('video');
+            const resultDiv = document.getElementById('result');
+            document.body.appendChild(video);
+
+            codeReader = new ZXing.BrowserBarcodeReader();
+            codeReader.listVideoInputDevices()
+                .then((videoInputDevices) => {
+                    if (videoInputDevices.length > 0) {
+                        codeReader.decodeFromInputVideoDevice(videoInputDevices[0].deviceId, 'video')
+                            .then((result) => {
+                                resultDiv.textContent = result.text;
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    } else {
+                        console.error('No se encontraron dispositivos de video');
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
+        function stopBarcodeScanner() {
+            codeReader.stopStreams();
+            const video = document.querySelector('video');
+            video.pause();
+            video.srcObject.getTracks().forEach(track => track.stop());
+            document.body.removeChild(video);
+            document.getElementById('result').textContent = '';
+        }
     </script>
 </body>
 
