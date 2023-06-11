@@ -14,12 +14,15 @@
     <div id="camera"></div>
     <div id="result"></div>
 
-    <button onclick="startBarcodeScanner()">Iniciar escaneo</button>
-    <button onclick="stopBarcodeScanner()">Detener escaneo</button>
+    <button id="startButton">Iniciar escaneo</button>
+    <button id="stopButton">Detener escaneo</button>
 
     <script src="https://unpkg.com/@zxing/library@0.19.0"></script>
     <script>
         let codeReader;
+
+        document.getElementById('startButton').addEventListener('click', startBarcodeScanner);
+        document.getElementById('stopButton').addEventListener('click', stopBarcodeScanner);
 
         function startBarcodeScanner() {
             const video = document.createElement('video');
