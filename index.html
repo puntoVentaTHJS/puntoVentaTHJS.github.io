@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title> Ler Barcode </title>
+    <title>Ler Barcode</title>
 </head>
 
 <body>
@@ -30,7 +30,7 @@
         }, function (err) {
             if (err) {
                 console.log(err);
-                return
+                return;
             }
             console.log("Initialization finished. Ready to start");
             Quagga.start();
@@ -38,9 +38,16 @@
 
         Quagga.onDetected(function (data) {
             console.log(data.codeResult.code);
-            alert(data.codeResult.code);
-            document.querySelector('#resultado').innerText = data.codeResult.code;
+            var resultadoDiv = document.querySelector('#resultado');
+            resultadoDiv.textContent = data.codeResult.code;
+            mostrarMensaje(data.codeResult.code);
         });
+
+        function mostrarMensaje(mensaje) {
+            var mensajeDiv = document.createElement('div');
+            mensajeDiv.textContent = mensaje;
+            document.body.appendChild(mensajeDiv);
+        }
 
     </script>
 
