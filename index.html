@@ -37,6 +37,7 @@
 
         Quagga.onDetected(function (data) {
             console.log(data.codeResult.code);
+            alert(data.codeResult.code);
             document.querySelector('#resultado').innerText = data.codeResult.code;
         });
 
