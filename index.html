@@ -5,52 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ler Barcode</title>
+    <title>Escanear códigos de barras</title>
 </head>
 
 <body>
+    <h1>Escanear códigos de barras</h1>
 
-    <div id="resultado"></div>
-    <div id="camera"></div>
-    <p>Probando 1</p>
+    <video id="preview"></video>
+    <div id="result"></div>
 
-    <script src="quagga.min.js"></script>
-
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
     <script>
-
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#camera')    // Or '#yourElement' (optional)
-            },
-            decoder: {
-                readers: ["code_128_reader"]
-            }
-        }, function (err) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log("Initialization finished. Ready to start");
-            Quagga.start();
+        let scanner = new Instascan.Scanner({
+            video: document.getElementById('preview')
         });
 
-        Quagga.onDetected(function (data) {
-            console.log(data.codeResult.code);
-            var resultadoDiv = document.querySelector('#resultado');
-            resultadoDiv.textContent = data.codeResult.code;
-            mostrarMensaje(data.codeResult.code);
+        scanner.addListener('scan', function (content) {
+            document.getElementById('result').textContent = content;
         });
 
-        function mostrarMensaje(mensaje) {
-            var mensajeDiv = document.createElement('div');
-            mensajeDiv.textContent = mensaje;
-            document.body.appendChild(mensajeDiv);
-        }
-
+        Instascan.Camera.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
+            } else {
+                console.error('No hay cámaras disponibles.');
+            }
+        }).catch(function (error) {
+            console.error(error);
+        });
     </script>
-
 </body>
 
 </html>
