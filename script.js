@@ -2,7 +2,7 @@ const tablaProductos = db.collection('productos');
 
 document.addEventListener("DOMContentLoaded", () => {
   const $resultados = document.querySelector("#resultado");
-  let isCameraActive = false;
+  let isCameraActive = true;
 
   Quagga.init({
     inputStream: {
