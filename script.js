@@ -2,6 +2,8 @@ const tablaProductos = db.collection('productos');
 
 document.addEventListener("DOMContentLoaded", () => {
   const $resultados = document.querySelector("#resultado");
+  const $nombre = document.querySelector("#nombre");
+  const $precio = document.querySelector("#precio");
   let isCameraActive = true;
 
   Quagga.init({
@@ -12,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       name: "Live",
       type: "LiveStream",
-      target: document.querySelector('#contenedor'), // Pasar el elemento del DOM
+      target: document.querySelector('#contenedor'),
     },
     decoder: {
       readers: ["ean_reader"]
@@ -34,17 +36,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isCameraActive) {
         Quagga.stop();
         isCameraActive = false;
+        //Ocultar o eliminar temporalmente la parte de la cámara
+        const $contenedor = document.querySelector('#contenedor');
+        $contenedor.style.display = 'none';
       }
 
-      const producto = prod.docs[0].data(); // Suponiendo que solo hay un resultado
-      const $infoProducto = document.querySelector("#info-producto");
-      $infoProducto.innerHTML = `
-        <h3>${producto.nombre}</h3>
-        <p>Precio: ${producto.precio}</p>
-      `;
-
+      const producto = prod.docs[0].data();
+      nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
+      precio.innerHTML = `<h4>${producto.precio}</h4>`
       setTimeout(() => {
-        $infoProducto.innerHTML = "";
+        $nombre = "";
+        $precio = "";
         if (!isCameraActive) {
           Quagga.start();
           isCameraActive = true;
