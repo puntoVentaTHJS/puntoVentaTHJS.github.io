@@ -1,5 +1,7 @@
 const tablaProductos = db.collection('productos');
 
+let epsilon = 3;
+
 document.addEventListener("DOMContentLoaded", () => {
   const $resultados = document.querySelector("#resultado");
   const $nombre = document.querySelector("#nombre");
@@ -29,34 +31,47 @@ document.addEventListener("DOMContentLoaded", () => {
     Quagga.start();
   });
 
-  Quagga.onDetected((data) => {
-    $resultados.textContent = data.codeResult.code;
-    const prod = tablaProductos.where("id", "==", data.codeResult.code).get();
-    if (!prod.empty) {
-      if (isCameraActive) {
-        Quagga.stop();
-        isCameraActive = false;
-        //Ocultar o eliminar temporalmente la parte de la cámara
-        const $contenedor = document.querySelector('#contenedor');
-        $contenedor.style.display = 'none';
-      }
+Quagga.onDetected((data) => {
+  let code = data.codeResult.code;
+  $resultados.textContent = code;
+  let prod = tablaProductos.where("id", "==", code).get();
 
-      const producto = prod.docs[0].data();
-      nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
-      precio.innerHTML = `<h4>${producto.precio}</h4>`
-      setTimeout(() => {
-        $nombre = "";
-        $precio = "";
-        if (!isCameraActive) {
-          Quagga.start();
-          isCameraActive = true;
-        }
-      }, 5000);
-    } else {
-      console.log("Ese producto no existe");
+  while (epsilon > 0 && prod.empty) {
+    code = code.slice(1); // Quita el primer dígito de la cadena
+    prod = tablaProductos.where("id", "==", code).get();
+    epsilon--;
+  }
+
+  if (!prod.empty) {
+    if (isCameraActive) {
+      Quagga.stop();
+      isCameraActive = false;
+      const $contenedor = document.querySelector('#contenedor');
+      $contenedor.style.display = 'none';
     }
-    console.log(data);
-  });
+
+    const producto = prod.docs[0].data();
+    $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
+    $precio.innerHTML = `<h4>${producto.precio}</h4>`;
+
+    setTimeout(() => {
+      $nombre.innerHTML = "";
+      $precio.innerHTML = "";
+      const $contenedor = document.querySelector('#contenedor');
+      $contenedor.style.display = 'block';
+
+      if (!isCameraActive) {
+        Quagga.start();
+        isCameraActive = true;
+      }
+    }, 5000);
+  } else {
+    console.log("Ese producto no existe");
+    // Aquí puedes agregar lógica adicional si deseas hacer algo cuando el producto no existe
+  }
+
+  console.log(data);
+});
 
   Quagga.onProcessed(function (result) {
     var drawingCtx = Quagga.canvas.ctx.overlay,
