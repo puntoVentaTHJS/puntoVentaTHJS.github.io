@@ -2,7 +2,7 @@ const tablaProductos = db.collection('productos');
 
 document.addEventListener("DOMContentLoaded", () => {
   const $resultados = document.querySelector("#resultado");
-  let isCameraActive = true;
+  let isCameraActive = false;
 
   Quagga.init({
     inputStream: {
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     console.log("Iniciado correctamente");
+    isCameraActive = true;
     Quagga.start();
   });
 
@@ -30,16 +31,18 @@ document.addEventListener("DOMContentLoaded", () => {
     $resultados.textContent = data.codeResult.code;
     const prod = tablaProductos.where("id", "==", data.codeResult.code).get();
     if (!prod.empty) {
-      // Quitar la vista de cámara y mostrar un texto con prod en su campo nombre,
-      // y por debajo su precio, esperar 5 segundos y volver a mostrar la cámara
-      Quagga.stop();
-      isCameraActive = false;
+      if (isCameraActive) {
+        Quagga.stop();
+        isCameraActive = false;
+      }
+
       const producto = prod.docs[0].data(); // Suponiendo que solo hay un resultado
       const $infoProducto = document.querySelector("#info-producto");
       $infoProducto.innerHTML = `
         <h3>${producto.nombre}</h3>
         <p>Precio: ${producto.precio}</p>
       `;
+
       setTimeout(() => {
         $infoProducto.innerHTML = "";
         if (!isCameraActive) {
