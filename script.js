@@ -33,47 +33,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  Quagga.onDetected(async (data) => {
-    let code = data.codeResult.code;
-    $resultados.textContent = code;
-    let prod = tablaProductos.where("id", "==", code).get();
+Quagga.onDetected(async (data) => {
+  let code = data.codeResult.code;
+  $resultados.textContent = code;
 
-    while (epsilon > 0 && prod.empty) {
-      code = code.slice(1); // Quita el primer dígito de la cadena
-      prod = tablaProductos.where("id", "==", code).get();
-      epsilon--;
-    }
+  let prod = await tablaProductos.where("id", "==", code).get(); // Esperar el resultado de la consulta
 
-    if (!prod.empty) {
-      if (isCameraActive) {
-        Quagga.stop();
-        isCameraActive = false;
-        const $contenedor = document.querySelector('#contenedor');
-        $contenedor.style.display = 'none';
-      }
+  while (epsilon > 0 && prod.empty) {
+    code = code.slice(1); // Quita el primer dígito de la cadena
+    prod = await tablaProductos.where("id", "==", code).get(); // Esperar el resultado de la consulta
+    epsilon--;
+  }
 
-      const producto = prod.docs[0].data();
-      $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
-      $precio.innerHTML = `<h4>${producto.precio}</h4>`;
-
-      await delay(5000); // Espera 5 segundos utilizando la función delay
-
-      $nombre.innerHTML = ""; // Corregir aquí
-      $precio.innerHTML = ""; // Corregir aquí
+  if (!prod.empty && prod.docs.length > 0) {
+    if (isCameraActive) {
+      Quagga.stop();
+      isCameraActive = false;
       const $contenedor = document.querySelector('#contenedor');
-      $contenedor.style.display = 'block';
-
-      if (!isCameraActive) {
-        Quagga.start();
-        isCameraActive = true;
-      }
-    } else {
-      console.log("Ese producto no existe");
-      // Aquí puedes agregar lógica adicional si deseas hacer algo cuando el producto no existe
+      $contenedor.style.display = 'none';
     }
 
-    console.log(data);
-  });
+    const producto = prod.docs[0].data();
+    $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
+    $precio.innerHTML = `<h4>${producto.precio}</h4>`;
+
+    await delay(5000);
+
+    $nombre.innerHTML = "";
+    $precio.innerHTML = "";
+    const $contenedor = document.querySelector('#contenedor');
+    $contenedor.style.display = 'block';
+
+    if (!isCameraActive) {
+      Quagga.start();
+      isCameraActive = true;
+    }
+  } else {
+    console.log("Ese producto no existe");
+  }
+
+  console.log(data);
+});
 
   Quagga.onProcessed(function (result) {
     var drawingCtx = Quagga.canvas.ctx.overlay,
