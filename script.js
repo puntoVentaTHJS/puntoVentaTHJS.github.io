@@ -4,8 +4,8 @@ let epsilon = 3;
 
 document.addEventListener("DOMContentLoaded", () => {
   const $resultados = document.querySelector("#resultado");
-  const $nombreR = document.querySelector("#nombre");
-  const $precioR = document.querySelector("#precio");
+  const $nombre = document.querySelector("#nombre");
+  const $precio = document.querySelector("#precio");
   let isCameraActive = true;
 
   Quagga.init({
@@ -53,13 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const producto = prod.docs[0].data();
-      $nombreR.innerHTML = `<h3>${producto.nombre}</h3>`;
-      $precioR.innerHTML = `<h4>${producto.precio}</h4>`;
+      $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
+      $precio.innerHTML = `<h4>${producto.precio}</h4>`;
 
       await delay(5000); // Espera 5 segundos utilizando la función delay
 
-      $nombreR.innerHTML = "";
-      $precioR.innerHTML = "";
+      $nombre.innerHTML = ""; // Corregir aquí
+      $precio.innerHTML = ""; // Corregir aquí
       const $contenedor = document.querySelector('#contenedor');
       $contenedor.style.display = 'block';
 
