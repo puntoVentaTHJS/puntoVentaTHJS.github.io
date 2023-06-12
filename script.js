@@ -31,30 +31,33 @@ document.addEventListener("DOMContentLoaded", () => {
     Quagga.start();
   });
 
-Quagga.onDetected((data) => {
-  let code = data.codeResult.code;
-  $resultados.textContent = code;
-  let prod = tablaProductos.where("id", "==", code).get();
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  while (epsilon > 0 && prod.empty) {
-    code = code.slice(1); // Quita el primer dígito de la cadena
-    prod = tablaProductos.where("id", "==", code).get();
-    epsilon--;
-  }
+  Quagga.onDetected(async (data) => {
+    let code = data.codeResult.code;
+    $resultados.textContent = code;
+    let prod = tablaProductos.where("id", "==", code).get();
 
-  if (!prod.empty) {
-    if (isCameraActive) {
-      Quagga.stop();
-      isCameraActive = false;
-      const $contenedor = document.querySelector('#contenedor');
-      $contenedor.style.display = 'none';
+    while (epsilon > 0 && prod.empty) {
+      code = code.slice(1); // Quita el primer dígito de la cadena
+      prod = tablaProductos.where("id", "==", code).get();
+      epsilon--;
     }
 
-    const producto = prod.docs[0].data();
-    $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
-    $precio.innerHTML = `<h4>${producto.precio}</h4>`;
+    if (!prod.empty) {
+      if (isCameraActive) {
+        Quagga.stop();
+        isCameraActive = false;
+        const $contenedor = document.querySelector('#contenedor');
+        $contenedor.style.display = 'none';
+      }
 
-    setTimeout(() => {
+      const producto = prod.docs[0].data();
+      $nombre.innerHTML = `<h3>${producto.nombre}</h3>`;
+      $precio.innerHTML = `<h4>${producto.precio}</h4>`;
+
+      await delay(5000); // Espera 5 segundos utilizando la función delay
+
       $nombre.innerHTML = "";
       $precio.innerHTML = "";
       const $contenedor = document.querySelector('#contenedor');
@@ -64,14 +67,13 @@ Quagga.onDetected((data) => {
         Quagga.start();
         isCameraActive = true;
       }
-    }, 5000);
-  } else {
-    console.log("Ese producto no existe");
-    // Aquí puedes agregar lógica adicional si deseas hacer algo cuando el producto no existe
-  }
+    } else {
+      console.log("Ese producto no existe");
+      // Aquí puedes agregar lógica adicional si deseas hacer algo cuando el producto no existe
+    }
 
-  console.log(data);
-});
+    console.log(data);
+  });
 
   Quagga.onProcessed(function (result) {
     var drawingCtx = Quagga.canvas.ctx.overlay,
